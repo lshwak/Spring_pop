@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pop.mapper.RepBoardMapper">
+<!-- 페이징 처리 안 한 게시판 전체 목록 -->
+	<select id="repboardList" resultType="com.pop.model.RepBoardVO"> 
+	<![CDATA[
+		select * from tbl_board;
+	]]>
+	</select>
+	<!-- 페이징 처리 한 게시판 전체 목록 -->
+	<select id="repboardListPage" resultType="com.pop.model.RepBoardVO"> 
+	
+	select bno, title, writer, regdate, viewcnt
+		from (
+			select @rownum:=@rownum+1 as rownum, bno, title, writer, regdate, viewcnt
+			from(select @rownum:=0) as rownum
+				, tbl_board
+			<if test="keyword!=null">
+			where title like concat('%',#{keyword},'%')
+			</if>
+			order by bno desc
+		) tbl_board
+	<![CDATA[
+	where rownum > (#{pageNum}-1)*#{amount} and rownum <= #{pageNum}*#{amount}
+	]]>
+	</select>
+	<!-- 제목을 클릭 했을 때 해당되는 게시물에 상세 내용 -->
+	<select id="repboardDetail" resultType="com.pop.model.RepBoardVO"> 
+	<![CDATA[
+		select * from tbl_board where bno = #{bno}
+	]]>
+	</select>
+	<!-- board테이블의 전체 갯수 : 페이징의 realEnd를 알기 위해서. -->
+	<select id="repboardCount" resultType="int">
+	
+		select count(*) from tbl_board
+		<if test="keyword !=null">
+			where title like concat('%',#{keyword},'%')
+		</if>
+	
+	</select>
+	
+	<!-- 글 쓰기 -->
+	<insert id="repboardWrite">
+		<![CDATA[	
+			insert into tbl_board (title, content, writer, regdate, viewcnt)
+			values(#{title},#{content},#{writer},regdate(),#{viewcnt})
+		]]>
+	</insert>
+	<!-- 글 수정 -->
+	<update id="repboardModify">
+		update tbl_board
+			set title = #{title},
+			content = #{content}
+   			where bno = #{bno}
+	</update>
+	<!-- 글 삭제 -->
+	<delete id="repboardDel">
+		delete from tbl_board
+		where bno = #{bno}
+	</delete>
+	
+</mapper>

@@ -1,0 +1,25 @@
+@charset "UTF-8";
+
+body {
+	background-color:#c1fde0;
+}
+
+#pang{
+	width:380px;
+	height:200px;
+}
+
+#mei {
+	width:380px;
+	height:200px;
+}
+
+#gao {
+	width:380px;
+	height:200px;
+}
+
+#chu {
+	width:380px;
+	height:200px;
+}

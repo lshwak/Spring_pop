@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pop.mapper.ReplyMapper">
+
+<insert id="repboardWrite">
+insert into tbl_reply(bno, replytext, replyer, regdate) 
+values(#{bno},#{replytext},#{replyer},sysdate())
+</insert>
+
+<update id="repboardModify">
+update tbl_reply
+set replytext=#{replytext}
+, updatedate=sysdate()
+where rno=#{rno}
+</update>
+<!-- 페이지 리스트 (페이징X) -->
+<select id="repboardList" resultType="com.pop.model.ReplyVO">
+select * 
+from tbl_reply
+where bno=#{bno}
+</select>
+<!-- 페이지 리스트 (페이징O) -->
+<select id="repboardListPage" resultType="com.pop.model.ReplyVO">
+select *
+from (
+		select @rownum:=@rownum+1 as rownum, rno, bno, replytext, replyer, regdate, updatedate
+		from(select @rownum:=0) as rownum
+			, tbl_reply
+			where bno=#{bno}
+		order by rno desc
+	) tbl_reply
+<![CDATA[
+where rownum > (#{cri.pageNum}-1) * #{cri.amount} and rownum <= #{cri.pageNum} * #{cri.amount}
+]]>
+</select>
+
+<select id="count" resultType="int">
+select count(*) from tbl_reply where bno=#{bno}
+</select>
+
+
+
+
+
+<delete id="repboardDel">
+delete from tbl_reply 
+where rno=#{rno}
+</delete>
+
+</mapper>
